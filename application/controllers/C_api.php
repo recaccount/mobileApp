@@ -3,40 +3,66 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class C_api extends CI_Controller {
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/welcome
-	 *	- or -
-	 * 		http://example.com/index.php/welcome/index
-	 *	- or -
-	 * Since this controller is set as the default controller in
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/welcome/<method_name>
-	 * @see https://codeigniter.com/user_guide/general/urls.html
-	 */
+	public $table;
+
 	public function __construct()
 	{
 		parent::__construct();
-		$tableName = "";
+		$this->load->model("M_api");
+		// $data = $this->M_api->get_data("device");
+		// $this->registration($data);
+		
 	}
 
 	public function registration()
-	{
-		$this->load->view('api');
-		
+	{	
+		// CONTROL and SECURITY of POSTED DATAS
+		if($this->input->method("post")){	
+			
+			$stream_clean = $this->input->raw_input_stream;
+			$request = json_decode($stream_clean);
+			
+			$uid 		= trim($request->uid);
+			$uuid 		= trim($request->uuid);
+			$appId 		= trim($request->appId);
+			$lang 	    = trim($request->lang);
+			$os 		= trim($request->os);
+
+
+			$data = json_decode($this->M_api->get_data("device",array("uuid" => $uuid)));
+			
+			if(checkData(array($uid,$uuid,$appId,$lang,$os))===true){
+				if(count($data)==0){
+					$res = $this->M_api->insert($uuid, $lang, $uid, $os, $appId);
+
+					if($res===true){
+						Response(200,"You're successfully registered","200","success");					
+					}
+
+				}
+				else{
+					Response(400,"You're already registered","400","failure");
+				}
+			}
+			
+
+
+			
+
+					
+			
+		}
 	}
 	
 	public function purchase() 
 	{
-		echo "Purchase";
+		$this->load->view("api");
+		// echo "Purchase";
 	}
 	
 	public function checkSubscription()
 	{
 		echo "Check Subscription";
 	}
+
 }
