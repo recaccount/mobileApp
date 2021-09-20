@@ -10,10 +10,10 @@ class M_api extends CI_Model {
     }
 
 
-    public function insert($uuid, $lang, $uid, $os, $appId) {
-        $insert_user_stored_proc = "CALL insert_device(?, ?, ?, ?, ?)";
-        $data = array('uuid' => $uuid, 'lang' => $lang, 'uid' => $uid, 'os' => $os, 'appId' => $appId);
-
+    public function insert_device($uuid, $lang, $uid, $os, $appid, $clientToken) {
+        $insert_user_stored_proc = "CALL insert_device(?, ?, ?, ?, ?,?)";
+        $data = array('uuid' => $uuid, 'uid' => $uid, 'appid' => $appid, 'lang' => $lang, 'os' => $os, 'client_token' => $clientToken );
+        
 
         $result = $this->db->query($insert_user_stored_proc, $data);
 
@@ -22,6 +22,20 @@ class M_api extends CI_Model {
         }
         return FALSE;
     }
+    
+    public function insert_purchase_reqs($clientToken, $receiptHash, $date, $expireDate) {
+        $insert_user_stored_proc = "CALL insert_purchase_reqs( ?, ? , ?, ? )";
+        $data = array('client_token' => $clientToken, 'receipt_hash' => $receiptHash, 'activity_date' => $date, 'expire_date' => $expireDate);
+        
+
+        $result = $this->db->query($insert_user_stored_proc, $data);
+
+        if ($result !== NULL) {
+            return TRUE;
+        }
+        return FALSE;
+    } 
+
 
     public function check_lang($langid) {
         $insert_user_stored_proc = "CALL check_lang(?)";
@@ -39,6 +53,7 @@ class M_api extends CI_Model {
         $result = $this->db->query($insert_user_stored_proc, $data);
         return $result;
     }
+    
 
 }
 
